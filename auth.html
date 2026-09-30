@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>StudyBox BD - Account</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f7fb;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 420px;
+            background: white;
+            padding: 30px 24px;
+            border-radius: 18px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.10);
+        }
+
+        .logo {
+            text-align: center;
+            font-size: 26px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 25px;
+            background: #f1f3f7;
+            border-radius: 10px;
+            padding: 4px;
+        }
+
+        .tabs button {
+            width: 50%;
+            border: none;
+            padding: 11px;
+            border-radius: 8px;
+            background: transparent;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .tabs button.active {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .form {
+            display: none;
+        }
+
+        .form.active {
+            display: block;
+        }
+
+        label {
+            display: block;
+            margin: 14px 0 6px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #d9dce3;
+            border-radius: 9px;
+            outline: none;
+            font-size: 15px;
+        }
+
+        input:focus {
+            border-color: #2563eb;
+        }
+
+        .main-btn {
+            width: 100%;
+            margin-top: 20px;
+            padding: 13px;
+            border: none;
+            border-radius: 9px;
+            background: #2563eb;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .forgot {
+            display: block;
+            text-align: right;
+            margin-top: 10px;
+            color: #2563eb;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            display: none;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .back {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #555;
+            text-decoration: none;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="logo">📚 StudyBox BD</div>
+
+    <div class="subtitle">
+        Student Learning Platform
+    </div>
+
+    <div class="tabs">
+        <button id="loginTab" class="active" onclick="showLogin()">
+            Login
+        </button>
+
+        <button id="signupTab" onclick="showSignup()">
+            Create Account
+        </button>
+    </div>
+
+    <!-- LOGIN -->
+
+    <div id="loginForm" class="form active">
+
+        <label>Email</label>
+
+        <input
+            type="email"
+            id="loginEmail"
+            placeholder="তোমার Email লিখো"
+        >
+
+        <label>Password</label>
+
+        <input
+            type="password"
+            id="loginPassword"
+            placeholder="Password লিখো"
+        >
+
+        <span class="forgot" onclick="forgotPassword()">
+            Password ভুলে গেছো?
+        </span>
+
+        <button class="main-btn" onclick="login()">
+            Login
+        </button>
+
+    </div>
+
+
+    <!-- SIGN UP -->
+
+    <div id="signupForm" class="form">
+
+        <label>নাম</label>
+
+        <input
+            type="text"
+            id="signupName"
+            placeholder="তোমার নাম"
+        >
+
+        <label>Email</label>
+
+        <input
+            type="email"
+            id="signupEmail"
+            placeholder="তোমার Email"
+        >
+
+        <label>Password</label>
+
+        <input
+            type="password"
+            id="signupPassword"
+            placeholder="কমপক্ষে ৬ অক্ষরের Password"
+        >
+
+        <button class="main-btn" onclick="signup()">
+            Create Account
+        </button>
+
+    </div>
+
+
+    <div id="message" class="message"></div>
+
+    <a class="back" href="index.html">
+        ← StudyBox BD Home
+    </a>
+
+</div>
+
+
+<script>
+
+    /* ==========================================
+       SUPABASE CONFIGURATION
+       ========================================== */
+
+    const SUPABASE_URL = "আhttps://hack248.github.io/StudyBox-BD/URL";
+
+    const SUPABASE_ANON_KEY = "https://hack248.github.io/StudyBox-BD/KEY";
+
+    const supabaseClient =
+        window.supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_ANON_KEY
+        );
+
+
+    /* ==========================================
+       TAB SWITCH
+       ========================================== */
+
+    function showLogin() {
+
+        document
+            .getElementById("loginForm")
+            .classList.add("active");
+
+        document
+            .getElementById("signupForm")
+            .classList.remove("active");
+
+        document
+            .getElementById("loginTab")
+            .classList.add("active");
+
+        document
+            .getElementById("signupTab")
+            .classList.remove("active");
+    }
+
+
+    function showSignup() {
+
+        document
+            .getElementById("signupForm")
+            .classList.add("active");
+
+        document
+            .getElementById("loginForm")
+            .classList.remove("active");
+
+        document
+            .getElementById("signupTab")
+            .classList.add("active");
+
+        document
+            .getElementById("loginTab")
+            .classList.remove("active");
+    }
+
+
+    /* ==========================================
+       MESSAGE
+       ========================================== */
+
+    function showMessage(text) {
+
+        const box =
+            document.getElementById("message");
+
+        box.style.display = "block";
+
+        box.textContent = text;
+    }
+
+
+    /* ==========================================
+       SIGN UP
+       ========================================== */
+
+    async function signup() {
+
+        const name =
+            document.getElementById("signupName").value.trim();
+
+        const email =
+            document.getElementById("signupEmail").value.trim();
+
+        const password =
+            document.getElementById("signupPassword").value;
+
+        if (!name || !email || !password) {
+
+            showMessage(
+                "সব তথ্য পূরণ করো।"
+            );
+
+            return;
+        }
+
+        if (password.length < 6) {
+
+            showMessage(
+                "Password কমপক্ষে ৬ অক্ষরের হতে হবে।"
+            );
+
+            return;
+        }
+
+        const { data, error } =
+            await supabaseClient.auth.signUp({
+
+                email: email,
+
+                password: password,
+
+                options: {
+
+                    data: {
+                        full_name: name
+                    },
+
+                    emailRedirectTo:
+                        window.location.origin +
+                        window.location.pathname
+                }
+            });
+
+
+        if (error) {
+
+            showMessage(
+                "Account তৈরি করা যায়নি: " +
+                error.message
+            );
+
+            return;
+        }
+
+
+        showMessage(
+            "Account তৈরি হয়েছে। Email verification চালু থাকলে তোমার Email inbox চেক করো।"
+        );
+    }
+
+
+    /* ==========================================
+       LOGIN
+       ========================================== */
+
+    async function login() {
+
+        const email =
+            document.getElementById("loginEmail").value.trim();
+
+        const password =
+            document.getElementById("loginPassword").value;
+
+
+        if (!email || !password) {
+
+            showMessage(
+                "Email এবং Password দাও।"
+            );
+
+            return;
+        }
+
+
+        const { data, error } =
+            await supabaseClient.auth.signInWithPassword({
+
+                email: email,
+
+                password: password
+            });
+
+
+        if (error) {
+
+            showMessage(
+                "Login করা যায়নি: " +
+                error.message
+            );
+
+            return;
+        }
+
+
+        showMessage(
+            "Login সফল হয়েছে!"
+        );
+
+
+        /*
+         * পরের ধাপে এখানে
+         * Dashboard-এ redirect করব।
+         */
+
+    }
+
+
+    /* ==========================================
+       FORGOT PASSWORD
+       ========================================== */
+
+    async function forgotPassword() {
+
+        const email =
+            document.getElementById("loginEmail").value.trim();
+
+
+        if (!email) {
+
+            showMessage(
+                "আগে Login box-এ তোমার Email লিখো।"
+            );
+
+            return;
+        }
+
+
+        const { error } =
+            await supabaseClient.auth.resetPasswordForEmail(
+                email,
+                {
+                    redirectTo:
+                        window.location.origin +
+                        "/reset-password.html"
+                }
+            );
+
+
+        if (error) {
+
+            showMessage(
+                "Reset Email পাঠানো যায়নি: " +
+                error.message
+            );
+
+            return;
+        }
+
+
+        showMessage(
+            "Password reset করার জন্য Email পাঠানো হয়েছে।"
+        );
+    }
+
+</script>
+
+</body>
+</html>
